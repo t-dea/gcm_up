@@ -36,6 +36,7 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.ParseException;
 import org.xmlpull.v1.XmlPullParser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,9 +76,11 @@ public class CcsClient {
 
     /// new: some additional instance and class members
     private static CcsClient sInstance = null;
-    private String mApiKey = "AIzaSyC_oi5v-QwyHirz_xbDzwcdcAROWrZ-xwc";
+    private String mApiKey = "AIzaSyBo_aJ9OzXH4NQVyjcaqTEjG-zX1x8okbU";
     private String mProjectId = null;
     private boolean mDebuggable = false;
+    static List<String> seq;
+    static int index = 0;
 
     /**
      * XMPP Packet Extension for GCM Cloud Connection Server.
@@ -152,7 +155,7 @@ public class CcsClient {
     
     private CcsClient(String projectId, String apiKey, boolean debuggable) {
         this();
-        mApiKey = "AIzaSyC_oi5v-QwyHirz_xbDzwcdcAROWrZ-xwc";
+        mApiKey = "AIzaSyBo_aJ9OzXH4NQVyjcaqTEjG-zX1x8okbU";
         mProjectId = projectId;
         mDebuggable = debuggable;
     }
@@ -234,7 +237,7 @@ public class CcsClient {
 
         // unique id of this message
         String messageId = jsonObject.get("message_id").toString();
-        
+
         @SuppressWarnings("unchecked")
         Map<String, String> payload = (Map<String, String>) jsonObject.get("data");
 
@@ -436,11 +439,12 @@ public class CcsClient {
             try {
                 handleIncomingDataMessage(msg);
                 // Send ACK to CCS
-                String apiKey = "AIzaSyC_oi5v-QwyHirz_xbDzwcdcAROWrZ-xwc";
-                //Content content = createContent(msg);
-                //Post2Gcm.post(apiKey, content);
+                String apiKey = "AIzaSyBo_aJ9OzXH4NQVyjcaqTEjG-zX1x8okbU";
+                Content content = createContent(msg);
+                Post2Gcm.post(apiKey, content);
                 String ack = createJsonAck(msg.getFrom(), msg.getMessageId());
                 send(ack);
+
             }
             catch (Exception e) {
                 // Send NACK to CCS
@@ -460,45 +464,54 @@ public class CcsClient {
     }
 
     public static void main(String[] args) {
-        final String projectId = "813916479990";
+        final String projectId = "709827214921";
         final String password = "";
         //final String toRegId = "APA91bGtjDTQ3SAb69VfzW6FaBy6Wq-5KqX9T1qu7LX-DKHu8FNpqzgaoZ8oR4OQ8fRmues4q3rW7FgyrSB19l4RiTiIPyHNHjGXy3VpbbxlmgVZEmrTeO7uKDg0NRNHvPNt9VK9K9Ol";
-        final String toRegId ="APA91bGY4dIfSQXSKtJWMURy2QpJl9yyivYezFDD03kURk0x8EaVj31zmxALgjmg0bVh9eoGCwc5BWNXQh0CFZ9inFk1BJR2WBPLT8MT9ZvXCgX7wRchLlC0GgfxclqIux3vOLHNDiRJ";
+        final String toRegId ="APA91bH4gDXCzhR0Ugw_VZicoylRIHysE_orRmvCAhs6FOmloTudGvztxl0I-02HDV5M7-uGdkCwf9x8vpTmtS3MiZ3e84EE7Eu5kmpzZyT00UwtAtsRgeUEb12RFYe8uwY2fTDaBzp_";
         //final String toRegId = "APA91bGNKqkUQsqv3-Yjh2f84U8Z9v4z6hQ1XUy2g9pDztwGcB28SITCZFBPKgUGVJOvu-oYUyt--fdKiEuxq45vJRZjPYrvYUXQOe9Q0xmBpwofNUTjVNitQW3A1D16rlN0xeoszsZa";
         CcsClient ccsClient = CcsClient.prepareClient(projectId, password, true);
+
+//        seq = new ArrayList<String>();
+//        seq.add("hello");
+//        seq.add("world");
+//        seq.add("cse");
+//        seq.add("110");
+//        seq.add("software");
+//        seq.add("engineering");
 
         try {
             ccsClient.connect();
         } catch (XMPPException e) {
             e.printStackTrace();
+        }
 
         // Send a sample hello downstream message to a device.
-        String messageId = ccsClient.getRandomMessageId();
-        Map<String, String> payload = new HashMap<String, String>();
-        payload.put("message", "Simple sample sessage");
-        String collapseKey = "sample";
-        Long timeToLive = 10000L;
-        Boolean delayWhileIdle = true;
-        //ccsClient.send(createJsonMessage(toRegId, messageId, payload, collapseKey,
-          //      timeToLive, delayWhileIdle));
-
+//        String messageId = ccsClient.getRandomMessageId();
+//        Map<String, String> payload = new HashMap<String, String>();
+//        payload.put("message", "Simple sample sessage");
+//        String collapseKey = "sample";
+//        Long timeToLive = 10000L;
+//        Boolean delayWhileIdle = true;
+//        ccsClient.send(createJsonMessage(toRegId, messageId, payload, collapseKey,
+//                timeToLive, delayWhileIdle));
 
         //Content content = createContent();
 
 
 
+
     }
-    }
-   /* public static Content createContent(CcsMessage msg ) {
+    public static Content createContent(CcsMessage msg ) {
         Content c = new Content();
 
         //c.addRegId("APA91bGNKqkUQsqv3-Yjh2f84U8Z9v4z6hQ1XUy2g9pDztwGcB28SITCZFBPKgUGVJOvu-oYUyt--fdKiEuxq45vJRZjPYrvYUXQOe9Q0xmBpwofNUTjVNitQW3A1D16rlN0xeoszsZa");
        // c.addRegId("APA91bGtjDTQ3SAb69VfzW6FaBy6Wq-5KqX9T1qu7LX-DKHu8FNpqzgaoZ8oR4OQ8fRmues4q3rW7FgyrSB19l4RiTiIPyHNHjGXy3VpbbxlmgVZEmrTeO7uKDg0NRNHvPNt9VK9K9Ol");
         System.out.println("herhehrehr");
-        c.addRegId("APA91bGB-ZbeyCtLP_QRNQE5zu4Y-1LgRlTFiIMh2vDrhtgVwL5vTo5DYiE_YFo4ftOjxk4Nihykt_LSTPL9T_7FX64I7EQoe-l_eQ_4-T36BwAdOgAioktNUE1fwFoaPe6fdzQ1Aayx");
-            String str = msg.getPayload().get("message");
+        c.addRegId("APA91bF7hc4wAHiF9JCTqOhbdXR6oqLwrJw1xpT1LhPfKOyy3oE_sf_I_oBwDKBkVVlOX1naCz0IT8Egj32XFUc07xxm-HRDybudcIruzH6Jbxrm5o5AWPZxA2wvP1XzhmMGWy2Kys9I");
+
+        String str = msg.getPayload().get("message");
         c.createData(str, "popop");
 
         return c;
-    }*/
+    }
 }

@@ -16,6 +16,8 @@
 package com.grokkingandroid.sampleapp.samples.gcm;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.app.IntentService;
 import android.app.NotificationManager;
@@ -42,6 +44,7 @@ public class GcmIntentService extends IntentService {
    private NotificationManager mNotificationManager;
    private String mSenderId = null;
 
+
    public GcmIntentService() {
       super("GcmIntentService");
    }
@@ -54,54 +57,56 @@ public class GcmIntentService extends IntentService {
       // action handling for actions of the activity
       String action = intent.getAction();
       Log.v("grokkingandroid", "action: " + action);
-      if (action.equals(Constants.ACTION_REGISTER)) {
-         register(gcm, intent);
-      } else if (action.equals(Constants.ACTION_UNREGISTER)) {
-         unregister(gcm, intent);
-      } else if (action.equals(Constants.ACTION_ECHO)) {
-         sendMessage(gcm, intent);
-      }
+         if (action.equals(Constants.ACTION_REGISTER)) {
+            register(gcm, intent);
+         } else if (action.equals(Constants.ACTION_UNREGISTER)) {
+            unregister(gcm, intent);
+         } else if (action.equals(Constants.ACTION_ECHO)) {
+            sendMessage(gcm, intent);
+         }
 
-      // handling of stuff as described on
-      // http://developer.android.com/google/gcm/client.html
-      try {
-         Bundle extras = intent.getExtras();
-         // The getMessageType() intent parameter must be the intent you
-         // received in your BroadcastReceiver.
-         String messageType = gcm.getMessageType(intent);
+         // handling of stuff as described on
+         // http://developer.android.com/google/gcm/client.html
+         try {
+            Bundle extras = intent.getExtras();
+            // The getMessageType() intent parameter must be the intent you
+            // received in your BroadcastReceiver.
+            String messageType = gcm.getMessageType(intent);
 
-         if (extras != null && !extras.isEmpty()) { // has effect of
-                                                    // unparcelling Bundle
+            if (extras != null && !extras.isEmpty()) { // has effect of
+               // unparcelling Bundle
             /*
              * Filter messages based on message type. Since it is likely that
              * GCM will be extended in the future with new message types, just
              * ignore any message types you're not interested in, or that you
              * don't recognize.
              */
-            if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR
-                  .equals(messageType)) {
-               sendNotification("Send error: " + extras.toString());
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED
-                  .equals(messageType)) {
-               sendNotification("Deleted messages on server: "
-                     + extras.toString());
-               // If it's a regular GCM message, do some work.
-            } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
-                  .equals(messageType)) {
-               // Post notification of received message.
-               String msg = extras.getString("message");
-               if (TextUtils.isEmpty(msg)) {
-                  msg = "empty message";
+               if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR
+                       .equals(messageType)) {
+                  sendNotification("Send error: " + extras.toString());
+               } else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED
+                       .equals(messageType)) {
+                  sendNotification("Deleted messages on server: "
+                          + extras.toString());
+                  // If it's a regular GCM message, do some work.
+               } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE
+                       .equals(messageType)) {
+                  // Post notification of received message.
+                  String msg = extras.getString("message");
+                  if (TextUtils.isEmpty(msg)) {
+                     msg = "empty message";
+                  }
+
+                  sendNotification(msg);
+                  Log.i("grokkingandroid", "Received: " + extras.toString()
+                          + ", sent: " + msg);
                }
-               sendNotification(msg);
-               Log.i("grokkingandroid", "Received: " + extras.toString()
-                     + ", sent: " + msg);
             }
+         } finally {
+            // Release the wake lock provided by the WakefulBroadcastReceiver.
+            GcmBroadcastReceiver.completeWakefulIntent(intent);
          }
-      } finally {
-         // Release the wake lock provided by the WakefulBroadcastReceiver.
-         GcmBroadcastReceiver.completeWakefulIntent(intent);
-      }
+
    }
 
    private void unregister(GoogleCloudMessaging gcm, Intent intent) {
@@ -201,6 +206,7 @@ public class GcmIntentService extends IntentService {
 
    private void sendMessage(GoogleCloudMessaging gcm, Intent intent) {
       try {
+
          String msg = intent.getStringExtra(Constants.KEY_MESSAGE_TXT);
          Bundle data = new Bundle();
          data.putString(Constants.ACTION, Constants.ACTION_ECHO);

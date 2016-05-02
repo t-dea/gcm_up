@@ -38,6 +38,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.grokkingandroid.sampleapp.samples.gcm.Constants.EventbusMessageType;
 import com.grokkingandroid.sampleapp.samples.gcm.Constants.State;
 
+import java.util.ArrayList;
+
 import de.greenrobot.event.EventBus;
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 import de.keyboardsurfer.android.widget.crouton.Style;
@@ -201,22 +203,59 @@ public class GcmDemoFragment extends DemoBaseFragment implements
       getActivity().startService(regIntent);
    }
 
-   private void sendMessage() {
+//   private void sendMessage() {
+//      Intent msgIntent = new Intent(getActivity(), GcmIntentService.class);
+//      msgIntent.setAction(Constants.ACTION_ECHO);
+//      String msg;
+//      if (!TextUtils.isEmpty(mTxtMsg.getText())) {
+//         msg = mTxtMsg.getText().toString();
+//         mTxtMsg.setText("");
+//      }
+//      else {
+//         msg = getActivity().getString(R.string.no_message);
+//      }
+//      String msgTxt = getString(R.string.msg_sent, msg);
+//      Crouton.showText(getActivity(), msgTxt, Style.INFO);
+//      msgIntent.putExtra(Constants.KEY_MESSAGE_TXT, msg);
+//      getActivity().startService(msgIntent);
+//   }
+private void sendMessage() {
+   ArrayList<String> seq = new ArrayList<String>();
+   seq.add("hello");
+   seq.add("world");
+   seq.add("cse");
+   seq.add("110");
+   seq.add("software");
+   seq.add("engineering");
+
+//   for(int i=0; i<seq.size(); i++) {
+//      mTxtMsg.setText(seq.get(i));
       Intent msgIntent = new Intent(getActivity(), GcmIntentService.class);
       msgIntent.setAction(Constants.ACTION_ECHO);
+   for(int i=0; i<seq.size(); i++) {
       String msg;
-      if (!TextUtils.isEmpty(mTxtMsg.getText())) {
-         msg = mTxtMsg.getText().toString();
-         mTxtMsg.setText("");
-      }
-      else {
-         msg = getActivity().getString(R.string.no_message);
-      }
+//      if (!TextUtils.isEmpty(mTxtMsg.getText())) {
+//         msg = mTxtMsg.getText().toString();
+//         mTxtMsg.setText("");
+//      } else {
+//         msg = getActivity().getString(R.string.no_message);
+//      }
+      msg = seq.get(i);
       String msgTxt = getString(R.string.msg_sent, msg);
-      Crouton.showText(getActivity(), msgTxt, Style.INFO);            
+      Crouton.showText(getActivity(), msgTxt, Style.INFO);
       msgIntent.putExtra(Constants.KEY_MESSAGE_TXT, msg);
       getActivity().startService(msgIntent);
+
+      try {
+         Thread.sleep(10000);
+      } catch (InterruptedException e) {
+         e.printStackTrace();
+      }
    }
+
+
+}
+
 
     /**
      * EventBus messages.
